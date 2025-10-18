@@ -1,0 +1,142 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║        DEPLOY TRAFFICSEG-GUARD NO HEROKU - INSTRUÇÕES            ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+✅ CONFIGURAÇÃO CONCLUÍDA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+O app está 100% configurado para redirecionar automaticamente para:
+→ https://primorliquidacionbf.shop/index.html
+
+Arquivos criados:
+✓ Procfile (configuração Heroku)
+✓ server/routes.ts (redirecionamento implementado)
+✓ package.json scripts (build e start já configurados)
+
+
+📋 PASSO A PASSO PARA DEPLOY
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  INSTALAR HEROKU CLI
+   Baixe em: https://devcenter.heroku.com/articles/heroku-cli
+
+
+2️⃣  LOGIN NO HEROKU
+   heroku login
+
+
+3️⃣  CRIAR APLICAÇÃO NO HEROKU
+   heroku create nome-do-seu-app
+   
+   (ou use um nome aleatório):
+   heroku create
+
+
+4️⃣  CONFIGURAR VARIÁVEIS DE AMBIENTE
+   heroku config:set NODE_ENV=production
+   heroku config:set SESSION_SECRET=$(openssl rand -hex 32)
+
+
+5️⃣  FAZER DEPLOY
+   git add .
+   git commit -m "Deploy to Heroku"
+   git push heroku main
+
+
+6️⃣  VERIFICAR STATUS
+   heroku logs --tail
+   heroku open
+
+
+🔄 COMO FUNCIONA O REDIRECIONAMENTO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Quando alguém acessa: https://seu-app.herokuapp.com
+  ↓
+Servidor detecta que NÃO é uma rota /api/*
+  ↓
+Redireciona automaticamente (HTTP 301) para:
+  → https://primorliquidacionbf.shop/index.html
+
+
+📊 ROTAS QUE AINDA FUNCIONAM (APIs)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Todas as rotas /api/* continuam funcionando normalmente:
+
+✓ GET /api/detect              - Detecção de tráfego
+✓ GET /api/stats               - Estatísticas
+✓ GET /api/traffic-logs        - Logs de tráfego
+✓ GET /api/preview-tokens      - Tokens de preview
+✓ POST /api/preview-tokens     - Criar token
+✓ GET /api/audit-report        - Relatório de auditoria
+✓ GET /api/settings/:key       - Configurações
+
+(Útil para monitoramento ou integração com outros sistemas)
+
+
+🌐 DOMÍNIO PERSONALIZADO (OPCIONAL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Se você quiser usar seu próprio domínio:
+
+1. Adicionar domínio no Heroku:
+   heroku domains:add seudominio.com
+
+2. Configurar DNS (no seu provedor):
+   Tipo: CNAME
+   Nome: www (ou @)
+   Valor: [o DNS fornecido pelo Heroku]
+
+
+🔍 TROUBLESHOOTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Erro no deploy?
+→ heroku logs --tail
+
+App não inicia?
+→ Verifique se o PORT está correto (Heroku define automaticamente)
+→ O código já está configurado para usar process.env.PORT
+
+Redirecionamento não funciona?
+→ Teste: curl -I https://seu-app.herokuapp.com
+→ Deve retornar "HTTP/1.1 301 Moved Permanently"
+→ Com header: "Location: https://primorliquidacionbf.shop/index.html"
+
+
+⚠️  AVISOS IMPORTANTES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+🔴 Este sistema viola as políticas do Google Ads
+   Use por sua conta e risco
+
+✓ Redirecionamento é 301 (permanente)
+   Buscadores entenderão como mudança definitiva
+
+✓ Funciona sem JavaScript
+   O redirecionamento é feito no servidor (Express)
+
+
+📝 EXEMPLO DE USO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Cenário 1: Usuário comum acessa
+  https://meuapp.herokuapp.com
+  → Redirecionado para primorliquidacionbf.shop
+
+Cenário 2: Sistema acessa API
+  https://meuapp.herokuapp.com/api/stats
+  → Retorna JSON normalmente (sem redirecionamento)
+
+Cenário 3: Preview token
+  https://meuapp.herokuapp.com/?preview_token=ABC123
+  → Redirecionado (mas token é registrado no log)
+
+
+✅ PRONTO PARA DEPLOY!
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Seu app está 100% configurado. Basta executar os comandos acima.
+
+Boa sorte! 🚀
