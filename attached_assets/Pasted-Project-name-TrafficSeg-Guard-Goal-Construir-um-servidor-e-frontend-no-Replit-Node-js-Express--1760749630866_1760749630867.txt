@@ -1,0 +1,59 @@
+Project name: TrafficSeg-Guard
+
+Goal:
+Construir um servidor e frontend no Replit (Node.js + Express) que:
+1. Detecte e classifique tráfego em tempo real (humano legítimo / bot suspeito / crawler legítimo).
+2. Sirva experiências diferentes de forma LEGÍTIMA:
+   - versão pública (compatível com políticas e anúncios);
+   - versão “rich” somente para usuários autenticados ou com token de QA;
+   - rota pública específica para crawlers/indexadores (ex.: /robot-info) com conteúdo documentado.
+3. Integre mitigação: rate limiting, reCAPTCHA/turnstile, honeypot, WAF headers, logs e dashboard de eventos.
+4. Forneça endpoints de auditoria para compliance com Google Ads (relatório de alterações, logs de redirecionamentos e decisões de bloqueio).
+
+Tech stack:
+- Backend: Node.js (18+) + Express
+- DB: SQLite (Replit-friendly) ou arquivo JSON para POC (substituível por Supabase/Postgres)
+- Frontend: React (Create React App / Vite)
+- Bibliotecas: FingerprintJS (ou heurísticas próprias), ua-parser-js, express-rate-limit, helmet, cors, @sentry/node (opcional), axios
+- Optional integration: Cloudflare Worker / Cloudflare Bot Management (documentar integração)
+- Captcha: Cloudflare Turnstile or Google reCAPTCHA v3
+- Logging: Winston + endpoints para visualizar logs (ou simples UI React)
+- Tests: jest / supertest para endpoints críticos
+
+Functional requirements:
+1. Incoming request pipeline:
+   - Registrar IP, user-agent, accept headers, country (via geoip-lite or geolocation header), UTM params, referer, timestamp.
+   - Heurísticas de score:
+     * JS execution check (render page that runs a small JS snippet and posts back a token)
+     * Mouse/touch events timing (for forms or conversion pages)
+     * UA legitimacy (ua-parser + blacklist)
+     * Known bot IP ranges (configurable list)
+     * FingerprintJS score if available
+   - Score thresholds -> classify as: HUMAN / SUSPICIOUS / KNOWN_CRAWLER.
+2. Serve pages:
+   - HUMAN: serve full page with personalization (client-side enhancements).
+   - SUSPICIOUS: challenge flow (rate-limit, reCAPTCHA, or require email/OTP).
+   - KNOWN_CRAWLER: serve a responsibly minimal page or `/robot-info` if crawlers (and set appropriate robots.txt).
+   - QA/Reviewer preview: Access only via secure token or login; token must be requested from an admin panel (no secret in ads). Provide `?preview_token=XXXX` with token issuer UI.
+3. Admin dashboard:
+   - Show recent requests, classification reasons, actions taken (challenge/blocked), and allow whitelist/blacklist IPs/UA.
+4. Compliance features:
+   - Endpoint `/audit/decision/:id` that returns why a request was challenged/blocked (for transparency).
+   - Generate a “policy compliance report” summarizing redirects/challenges in last N days.
+
+Non-functional requirements:
+- All UX served to ad landing pages must match what’s shown in ad creative and landing policy. No deception.
+- Secure token for preview must be logged and auditable.
+- Modular rules engine so thresholds are tunable.
+- Unit and integration tests for classification logic and challenge flows.
+
+Deliverables:
+1. Repo with:
+   - `server/` Express app with middleware for detection and routes for pages.
+   - `client/` React POC with 3 page variants.
+   - `admin/` simple admin UI to issue preview tokens, see logs, whitelist/blacklist.
+   - `README.md` with deployment instructions and how to configure Cloudflare & Captcha.
+   - Tests folder with at least 5 tests covering detection and challenge endpoints.
+2. Demo instructions:
+   - How to run locally on Replit.
+   - How to s
